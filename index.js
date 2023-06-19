@@ -20,13 +20,16 @@ const preimage = crypto.randomBytes(32)
 const digest = crypto.createHmac('sha256', preimage).digest()
 const LOCKTIME = 30 * 86400; // 30 days
 
-const address = generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, LOCKTIME)
+const address = generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, LOCKTIME, 'testnet')
 console.log("Preimage: ", preimage.toString('hex'))
 console.log("Hash: ", digest.toString('hex'))
 console.log("Address: ", address)
 
-function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, locktime) {
+function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, locktime, chain = 'mainnet') {
   const locktimeBuffer = numberToBuffer(locktime)
+  let version
+  if (chain === "mainnet") version = '05'
+  if (chain === "testnet") version = 'c1'
 
   // OP_IF
   //     OP_SHA256 <digest> OP_EQUALVERIFY OP_DUP OP_HASH160 <receiverPubKeyHash>
@@ -56,7 +59,7 @@ function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, locktime) {
 
   const redeemScriptHash = crypto.createHmac('ripemd160', crypto.createHmac('sha256', redeemScript).digest()).digest()
 
-  return base58Check.encode(redeemScriptHash, '05')
+  return base58Check.encode(redeemScriptHash, version)
 }
 
 function numberToBuffer(num) {
