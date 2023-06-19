@@ -1,0 +1,28 @@
+{
+  "name": "bip-199",
+  "version": "0.0.1",
+  "description": "Node.js implementation for BIP-199 (Bitcoin)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZigZagExchange/bip-199-node-js.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "bip",
+    "bip-199",
+    "atomic-swap"
+  ],
+  "author": "taureau75",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZigZagExchange/bip-199-node-js/issues"
+  },
+  "homepage": "https://github.com/ZigZagExchange/bip-199-node-js#readme",
+  "dependencies": {
+    "secp256k1": "^5.0.0"
+  }
+}
