@@ -15,8 +15,35 @@ do {
 const refundPubKey = secp256k1.publicKeyCreate(refundPrivKey)
 const refundPubKeyHash = crypto.createHmac('ripemd160', crypto.createHmac('sha256', refundPubKey).digest()).digest()
 
+const preimage = crypto.randomBytes(32)
+const digest = crypto.createHmac('sha256', preimage).digest()
+
 console.log(receiverPubKeyHash, refundPubKeyHash)
 
 function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash) {
-
+  // OP_IF
+  //     OP_SHA256 <digest> OP_EQUALVERIFY OP_DUP OP_HASH160 <receiverPubKeyHash>
+  // OP_ELSE
+  //     <num> OP_CHECKSEQUENCEVERIFY OP_DROP OP_DUP OP_HASH160 <refundPubKeyHash>
+  // OP_ENDIF
+  // OP_EQUALVERIFY
+  // OP_CHECKSIG
+  const redeemScript = Buffer.alloc(113)
+  redeemScript[0] = 99 // OP_IF
+  redeemScript[1] = 168 // OP_SHA256
+  for (let i=0; i < 32; i++) redeemScript[i+2] = digest[i]
+  redeemScript[34] = 136 // OP_EQUALVERIFY
+  redeemScript[35] = 118 // OP_DUP
+  redeemScript[36] = 169 // OP_HASH160
+  for (let i=0; i < 32; i++) redeemScript[i+36] = receiverPubKeyHash[i]
+  redeemScript[69] = 103 // OP_ELSE
+  for (let i=0; i < 4; i++) redeemScript[i+38] = 0 // TODO: Add sequence number
+  redeemScript[74] = 178 // OP_CHECKSEQUENCEVERIFY
+  redeemScript[75] = 117 // OP_DROP
+  redeemScript[76] = 118 // OP_DUP
+  redeemScript[77] = 169 // OP_HASH160
+  for (let i=0; i < 32; i++) redeemScript[i+78] = refundPubKeyHash[i]
+  redeemScript[110] = 104 // OP_ENDIF
+  redeemScript[111] = 136 // OP_EQUALVERIFY
+  redeemScript[112] = 172 // OP_CHECKSIG
 }
