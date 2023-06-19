@@ -28,8 +28,8 @@ console.log("Address: ", address)
 function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, locktime, chain = 'mainnet') {
   const locktimeBuffer = numberToBuffer(locktime)
   let version
-  if (chain === "mainnet") version = '05'
-  if (chain === "testnet") version = 'c1'
+  if (chain === "mainnet") version = '05' // Bitcoin script hash
+  if (chain === "testnet") version = 'c1' // Bitcoin testnet script hash
 
   // OP_IF
   //     OP_SHA256 <digest> OP_EQUALVERIFY OP_DUP OP_HASH160 <receiverPubKeyHash>
@@ -60,6 +60,12 @@ function generateBIP199Address(receiverPubKeyHash, refundPubKeyHash, locktime, c
   const redeemScriptHash = crypto.createHmac('ripemd160', crypto.createHmac('sha256', redeemScript).digest()).digest()
 
   return base58Check.encode(redeemScriptHash, version)
+}
+
+function generateBIP199UnlockRawTx(txid, vout, receiverPrivKey, preimage) {
+}
+
+function generateBIP199RefundRawTx(txid, vout, refundPrivKey) {
 }
 
 function numberToBuffer(num) {
